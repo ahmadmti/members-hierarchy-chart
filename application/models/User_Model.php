@@ -84,7 +84,7 @@ class User_Model extends CI_Model
     
                 }
               
-                $role['title'] =$result[$key]['UserID'];
+                $role['title'] = ' ID '.$result[$key]['UserID'];
                 $role['name'] = $result[$key]['username'];
                 $children = $this->build_child($result[$key]['UserID'], $i);              
                 if( !empty($children) ) {
