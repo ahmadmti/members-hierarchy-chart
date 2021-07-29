@@ -99,6 +99,8 @@ element.style {
                 'data': datascource,
                 'nodeContent': 'title',
                 'pan': true,
+                'draggable':false,
+                'direction':'t2b',
                 'zoom': false
             });
 

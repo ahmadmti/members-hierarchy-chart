@@ -1,99 +1,115 @@
 <?php
 class User_Model extends CI_Model 
 {
-public function get_tree()
-{   
-    $this->db->select('*'); 
-    $this->db->from('users'); 
-    $this->db->where('parentID',0); 
-    //  $this->db->limit(10, 5);
-    $query= $this->db->get(); 
-    $result = $query->result_array();
-
-    $roles = null;
-
-    foreach($result as $key=>$value)
+    public function get_treeLogin($id)
     {   
-        //  return $result[$key]['parentID'];
-            $role = array();
-            $role['parentID'] = $result[$key]['parentID'];
-
-            $role['title'] = $result[$key]['UserID'];
-            $role['name'] = $result[$key]['name'];
-            $children = $this->build_child($result[$key]['UserID']);              
-            if( !empty($children) ) {
-                $finalChildren=[];                   
-                foreach($children as $key=>$child){
-                    // return $child['children'];
-                    if(!empty($children[$key]['title']) && !empty($children[$key]['parentID'])){
-                        $finalChildren=[...$finalChildren,$child];
-                    }
-                    else {
-                        $finalChildren=[...$finalChildren,...$child['children']];
-
-                    }
-                }
-                $role['children'] = $finalChildren;
-
-            }
-            $roles = $role;             
-
-    }       
-    return $roles;
-}
-
-
-public function get_tree_search($id)
-{   
-     
-    $this->db->select('*'); 
-    $this->db->from('users'); 
-    $this->db->where('UserID',$id); 
-    //  $this->db->limit(10, 5);
-    $query= $this->db->get(); 
-     $result = $query->result_array();
-
-    $roles = null;
-
-    foreach($result as $key=>$value)
-    {   
-        //  return $result[$key]['parentID'];
-            $role = array();
-            $role['parentID'] = $result[$key]['parentID'];
-            if ($result[$key]['status'] == 0) {
-                $role['id'] = "red";
-                if ($result[$key]['UserID'] ==   $id) {
+         
+        $this->db->select('*'); 
+        $this->db->from('users'); 
+        $this->db->where('UserID',$id); 
+        //  $this->db->limit(10, 5);
+        $query= $this->db->get(); 
+         $result = $query->result_array();
+    
+        $roles = null;
+    
+        foreach($result as $key=>$value)
+        {   
+            $i=1;
+            //  return $result[$key]['parentID'];
+                $role = array();
+                $role['parentID'] = $result[$key]['parentID'];
+                if ($result[$key]['status'] == 0) {
                     $role['id'] = "red";
-                }
-
-            }
-          
-            
-
-            $role['title'] = $result[$key]['UserID'];
-            $role['name'] = $result[$key]['username'];
-            $children = $this->build_child($result[$key]['UserID']);              
-            if( !empty($children) ) {
-                $finalChildren=[];                   
-                foreach($children as $key=>$child){
-                    // return $child['children'];
-                    if(!empty($children[$key]['title']) && !empty($children[$key]['parentID'])){
-                        $finalChildren=[...$finalChildren,$child];
+                    if ($result[$key]['UserID'] ==   $id) {
+                        $role['id'] = "red";
                     }
-                    else {
-                        $finalChildren=[...$finalChildren,...$child['children']];
-
-                    }
+    
                 }
-                $role['children'] = $finalChildren;
+                $role['title'] = ' ID '.$result[$key]['UserID'] ;
+                $role['name'] = $result[$key]['username'];
+                
 
-            }
-            $roles = $role;             
+              
+                $children = $this->build_child($result[$key]['UserID'],$i);              
+                if( !empty($children) ) {
+                    $finalChildren=[];                   
+                    foreach($children as $key=>$child){
+                        
+                        if(!empty($children[$key]['title']) && !empty($children[$key]['parentID'])){
+                            $finalChildren=[...$finalChildren,$child];
+                          
+                        }
+                        else {
+                            
+                           if ($child && $child['children']) {
+                            $finalChildren=[...$finalChildren,...$child['children']];
 
-    }       
-    return $roles;
-}
-public function build_child($parent)
+                           } 
+    
+                        }
+                    }
+                    $role['children'] = $finalChildren;
+    
+                }
+                $roles = $role;             
+    
+        }       
+        return $roles;
+    }
+
+    public function get_tree_search($id)
+    {   
+         
+        $this->db->select('*'); 
+        $this->db->from('users'); 
+        $this->db->where('UserID',$id); 
+        //  $this->db->limit(10, 5);
+        $query= $this->db->get(); 
+         $result = $query->result_array();
+    
+        $roles = null;
+    
+        foreach($result as $key=>$value)
+        {   
+            $i = 1;
+            //  return $result[$key]['parentID'];
+                $role = array();
+                $role['parentID'] = $result[$key]['parentID'];
+                if ($result[$key]['status'] == 0) {
+                    $role['id'] = "red";
+                    if ($result[$key]['UserID'] ==   $id) {
+                        $role['id'] = "red";
+                    }
+    
+                }
+              
+                $role['title'] =$result[$key]['UserID'];
+                $role['name'] = $result[$key]['username'];
+                $children = $this->build_child($result[$key]['UserID'], $i);              
+                if( !empty($children) ) {
+                    $finalChildren=[];                   
+                    foreach($children as $key=>$child){
+                        // return $child['children'];
+                        if(!empty($children[$key]['title']) && !empty($children[$key]['parentID'])){
+                            $finalChildren=[...$finalChildren,$child];
+                        }
+                        else {
+                            $finalChildren=[...$finalChildren,...$child['children']];
+    
+                        }
+                    }
+                    $role['children'] = $finalChildren;
+    
+                }
+                $roles = $role;             
+    
+        }       
+        return $roles;
+    }
+    
+  
+public function build_child($parent,$i=0)
 {
     $this->db->select('*'); 
     $this->db->from('users'); 
@@ -103,22 +119,22 @@ public function build_child($parent)
     $result = $query->result_array();
 
     $roles = array();       
-
+    
     foreach($result as $key => $val) {
 
-            $role = array();
+        $role = array();
         if ($result[$key]['status']==1) {
            
    
             $role['parentID'] = $result[$key]['parentID'];
 
-            $role['title'] = $result[$key]['UserID'];
+            $role['title'] = ' ID '. $result[$key]['UserID'].' Level '. ($i);
             $role['name'] = $result[$key]['username'];
 
 
             // $role['contents'] = $result[$key]['dateAdded'];
 
-            $children = $this->build_child($result[$key]['UserID'],$result[$key]['status']);
+            $children = $this->build_child($result[$key]['UserID'],$i+1);
 
             if( !empty($children) ) {
                 $finalChildren=[];                   
@@ -142,8 +158,8 @@ public function build_child($parent)
     //     }
         }
         else {
-
-            $children = $this->build_child($result[$key]['UserID']);
+            
+            $children = $this->build_child($result[$key]['UserID'],$i);
 
             if( !empty($children) ) {
                 $finalChildren=[];                   
@@ -153,7 +169,10 @@ public function build_child($parent)
                         $finalChildren=[...$finalChildren,$child];
                     }
                     else {
-                        $finalChildren=[...$finalChildren,...$child['children']];
+                        if (count($child['children'])>0) {
+                            $finalChildren=[...$finalChildren,...$child['children']];
+
+                        }
 
                     }
                 }

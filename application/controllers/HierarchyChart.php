@@ -16,7 +16,8 @@ class HierarchyChart extends CI_Controller
 	public function chart()
 	{
 		$userId= $this->session->userdata('id'); 
-		$result=$this->User_Model->get_tree_search($userId);
+		// echo $userId;
+		$result=$this->User_Model->get_treeLogin($userId);
 		// echo json_encode($result,true);
 		$result['data']=json_encode($result,true);
 		$this->load->view('hierarchy_chart',$result);
